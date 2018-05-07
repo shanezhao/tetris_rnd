@@ -64,6 +64,26 @@ class Tetris
     this._update();
   }
 
+  serialize(){
+    return {
+      arena: {
+        matrix: this.arena.matrix,
+      },
+      player: {
+        matrix: this.player.matrix,
+        pos: this.player.pos,
+        score: this.player.score,
+      },
+    };
+  }
+
+  unserialize(state){
+    this.arena = Object.assign(state.arena);
+    this.player = Object.assign(state.player);
+    this.updateScore(this.player.score);
+    this.draw();
+  }
+
   //changes the html shown score with js calculated value
   updateScore(score){
     this.element.querySelector('.score').innerText = score;

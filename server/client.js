@@ -3,6 +3,8 @@ class Client{
         this.connection = connection;
         this.session = null;
         this.id = id;
+
+        this.state = null;
     }
 
     broadcast(data){
