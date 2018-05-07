@@ -5,6 +5,7 @@ class ConnectionManager{
         this.peers = new Map;
 
         this.tetrisManager = tetrisManager;
+        this.localTetris = [...tetrisManager.instances][0];
     }
 
     connect(address){
@@ -15,6 +16,7 @@ class ConnectionManager{
 
             //this.connection.send('create-session');
             this.initSession();
+            this.watchEvents();
         });
 
         this.connection.addEventListener('message', event => {
@@ -38,6 +40,38 @@ class ConnectionManager{
         }
     }
 
+    watchEvents(){
+        const local = this.localTetris;
+        const player = local.player;
+        ['pos', 'matrix', 'score'].forEach(prop => {
+            player.events.listen(prop, value => {
+                this.send({
+                    type: 'state-update',
+                    fragment: 'player',
+                    state: [prop, value],
+                });
+            });
+        });
+        const arena = local.arena;
+        ['matrix'].forEach(prop => {
+            arena.events.listen(prop, value => {
+                this.send({
+                    type: 'state-update',
+                    fragment: 'arena',
+                    state: [prop, value],
+                });
+            });
+        });
+        /*
+        this.player.events.listen('pos', pos=> {
+            console.log('Players pos changes', pos);
+        });
+
+        this.player.events.listen('matrix', matrix =>{
+            console.log('Plater matrix changed', matrix);
+        });*/
+    }
+
     updateManager(peers){
         const me = peers.you;
         const clients = peers.clients.filter(id => me !== id);
@@ -56,6 +90,21 @@ class ConnectionManager{
         });
     }
 
+    updatePeer(id, fragment, [prop, value]){
+        if(!this.peers.has(id)){
+            console.error('Client does not exist', id);
+            return;
+        }
+        const tetris = this.peers.get(id);
+        tetris[fragment][prop] = value;
+
+        if(prop === 'score'){
+            tetris.updateScore(value);
+        }else{
+            tetris.draw();
+        }
+    }
+
     receive(msg){
         const data = JSON.parse(msg);
         if(data.type === 'session-created'){
@@ -63,6 +112,9 @@ class ConnectionManager{
         }
         else if(data.type === 'session-broadcast'){
             this.updateManager(data.peers);
+        }
+        else if(data.type === 'state-update'){
+            this.updatePeer(data.clientId, data.fragment, data.state);
         }
     }
 

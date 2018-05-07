@@ -72,8 +72,11 @@ server.on('connection', conn =>{
 
             broadcastSession(session);
         }
+        else if(data.type === 'state-update'){
+            client.broadcast(data);
+        }
 
-        console.log('Sessions', sessions);
+        //console.log('Sessions', sessions);
 
     });
 

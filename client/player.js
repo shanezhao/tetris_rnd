@@ -5,6 +5,8 @@ class Player
     this.DROP_SLOW = 1000;
     this.DROP_FAST = 50;
 
+    this.events = new Events();
+
     this.tetris = tetris;
     this.arena = tetris.arena;
 
@@ -23,20 +25,25 @@ class Player
     this.pos.x += dir;
     if(this.arena.collide(this)){
       this.pos.x -= dir;
+      return;
     }
+    this.events.emit('pos', this.pos);
   }
 
   //simulated droping matrix by one frame
   drop(){
     this.pos.y++;
+    this.dropCounter = 0;
     if(this.arena.collide(this)){
       this.pos.y--;
       this.arena.merge(this);
       this.reset();
       this.score += this.arena.sweep();
-      this.tetris.updateScore(this.score);
+      this.events.emit('score', this.score);
+      return;
     }
-    this.dropCounter = 0;
+    this.events.emit('pos', this.pos);
+    
   }
 
   //makes next piece random and checks if the game is over and resets
@@ -49,8 +56,10 @@ class Player
       this.arena.clear();
       console.log("game over");
       this.score = 0;
-      this.tetris.updateScore(this.score);
+      this.events.emit('score', this.score);
     }
+    this.events.emit('pos', this.pos);
+    this.events.emit('matrix', this.matrix);
   }
 
   createPiece(type){
@@ -120,6 +129,7 @@ class Player
         return;
       }
     }
+    this.events.emit('matrix', this.matrix);
   }
 
   //rotates the matrix

@@ -8,10 +8,14 @@ class Arena
       matrix.push(new Array(w).fill(0));
     }
     this.matrix = matrix;
+
+    this.events = new Events();
   }
 
   clear(){
     this.matrix.forEach(row => row.fill(0));
+
+    this.events.emit('matrix', this.matrix);
   }
 
   //checks collision of pieces and border
@@ -34,8 +38,9 @@ class Arena
         if(value !== 0) {
           this.matrix[y + player.pos.y][x + player.pos.x] = value;
         }
-      })
-    })
+      });
+    });
+    this.events.emit('matrix', this.matrix);
   }
 
   //clears the arena/play area if there is a row
@@ -54,6 +59,7 @@ class Arena
       score += rowCount * 10;
       rowCount *= 2;
     }
+    this.events.emit('matrix', this.matrix);
     return score;
   }
 
