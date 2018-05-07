@@ -11,9 +11,7 @@ class ConnectionManager{
             console.log('Connection established');
 
             //this.connection.send('create-session');
-            this.send({
-                type: 'create-session',
-            });
+            this.initSession();
         });
 
         this.connection.addEventListener('message', event => {
@@ -21,6 +19,20 @@ class ConnectionManager{
             this.receive(event.data);
         });
 
+    }
+
+    initSession(){
+        const sessionId = window.location.hash.split('#')[1];
+        if(sessionId){
+            this.send({
+                type: 'join-session',
+                id: sessionId,
+            });
+        }else{
+            this.send({
+                type: 'create-session',
+            });
+        }
     }
 
     receive(msg){
