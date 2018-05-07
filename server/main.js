@@ -21,13 +21,18 @@ server.on('connection', conn =>{
 
     conn.on('message', msg => {
         console.log('Message received', msg);
+        const data = JSON.parse(msg);
 
-        if(msg === 'create-session'){
+        if(data.type === 'create-session'){
             const id = createId();
             const session = new Session(id);
             session.join(client);
             sessions.set(session.id, session);
-            console.log(sessions);
+            client.send({
+                type: 'session-created',
+                id: session.id,
+            });
+            //console.log(sessions);
         }
     });
 
