@@ -1,7 +1,8 @@
 class Client{
-    constructor(connection){
+    constructor(connection, id){
         this.connection = connection;
         this.session = null;
+        this.id = id;
     }
 
     send(data){

@@ -2,8 +2,10 @@
 const tetrisManager = new TetrisManager(document);
 
 const localTetris = tetrisManager.createPlayer();
+localTetris.element.classList.add('local');
+localTetris.run();
 
-const connectionManager = new ConnectionManager();
+const connectionManager = new ConnectionManager(tetrisManager);
 connectionManager.connect('ws://localhost:9000');
 
 //event listener for keys to move tetris block

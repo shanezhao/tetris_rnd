@@ -22,13 +22,13 @@ class Tetris
       '#3877FF',
     ];
 
-    let lastTime = 0;
-    const update = (time = 0) =>{ //updates the game/ gives it frames, delay of 1sec
+   let lastTime = 0;
+   this._update = (time = 0) =>{ //updates the game/ gives it frames, delay of 1sec
       const deltaTime = time - lastTime;
       lastTime = time;
       this.player.update(deltaTime);
       this.draw();
-      requestAnimationFrame(update);
+      requestAnimationFrame(this._update);
 
     }
     this.updateScore(0);
@@ -53,6 +53,10 @@ class Tetris
           }
         });
     });
+  }
+
+  run(){
+    this._update();
   }
 
   //changes the html shown score with js calculated value
